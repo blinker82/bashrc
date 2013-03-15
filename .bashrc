@@ -18,7 +18,8 @@ alias ls='ls --color'
 alias ll='ls -l'
 
 #plugin aliases
-alias gvimr='gvim --servername GVIM --remote-tab'
+alias gvimr_init='gvim_init_remote GVIM'
+alias gvimr='gvim_open_remote GVIM'
 alias tag='/usr/bin/ctags -R * &'
 
 #bash function aliases
@@ -33,6 +34,20 @@ alias archivenow='create_archive_tar_gz'
 alias git_oneline='git log --pretty=oneline --decorate'
 alias git_pretty='git log --pretty=format:'"'"'%C(yellow)%h%Cred%d%Creset - %C(cyan)%an %Creset: %s %Cgreen(%cr)'"'"
 alias git_graph='git log --graph --full-history --all --pretty=format:"%h%x09%d%x20%s"'
+
+#P4 Alias
+alias p4init='export P4CONFIG=.p4config'
+
+# gvim
+function gvim_init_remote()
+{
+    gvim --servername $1
+}
+
+function gvim_open_remote()
+{
+    gvim --servername $1 --remote-tab $2
+}
 
 # Print the current Path
 function print_curr_path_dir()
@@ -59,26 +74,6 @@ function ff()
     txtrst
 }
 
-#list files which contain the following names in the whole build
-function ffbase() 
-{ 
-    local currpath=$(pwd)
-    echo "currpath is $currpath"
-    gobase
-    txtbld
-    txtund
-    echo "find . -type f -iname '*'$*'*' -ls"
-    txtrst
-    txtblue
-    find . -type f -iname '*'$*'*' -ls
-    txtbld
-    txtund
-    echo "END RESULTS"
-    txtrst
-    
-    echo "currpath is $currpath"
-    cd $currpath
-}
 
 #list folders which contain the following name in this directory and its sub
 function ffr() 
@@ -119,29 +114,15 @@ function openfile()
    txtrst
 }
 
-#open file from the base of your build
-function openfilebase()
-{
-   local currpath=$(pwd)
-   gobase
-   PS3="Type a number or 'q' to quit:"
-   fileList=$(find . -type f -iname '*'$*'*')
-   txtblue
-   select fileName in $fileList; do
-        if [ -n "$fileName" ]; then
-           vim ${fileName}
-        fi
-        break
-   done
-   txtrst
-   cd $currpath
-}
 
 #goto directory of this file
 function gofile()
 {
    PS3="Type a number or 'q' to quit:"
+   txtbld
+   txtund
    fileList=$(find . -type f -iname '*'$*'*')
+   txtrst
    txtblue
    select fileName in $fileList; do
         if [ -n "$fileName" ]; then
@@ -157,7 +138,10 @@ function gofile()
 function godir()
 {
     PS3="Type a number or 'q' to quit:"
+    txtbld
+    txtund
     echo "find . -type d -iname '*'$*'*'"
+    txtrst
     folderList=$(find . -type d -iname '*'$*'*')
     txtblue
     select folderName in $folderList; do
@@ -169,21 +153,6 @@ function godir()
     txtrst
 }
 
-#goto this directory and search from base of build
-function godirbase()
-{
-   local currpath=$(pwd)
-   gobase
-   PS3="Type a number or 'q' to quit:"
-    folderList=$(find . -type d -iname '*'$*'*')
-    select folderName in $folderList; do
-        if [ -n "$folderName" ]; then
-            cd ${folderName}
-        fi
-        break
-    done
-    cd $currpath
-}
 
 # find this text in the file
 function findinfile()
@@ -199,25 +168,6 @@ function findinfile()
  txtred
  echo "RESULTS END"
  txtrst
-}
-
-# find this text in the file : search from base of build
-function findinfilebase()
-{
- local currpath=$(pwd)
- gobase
- txtbld
- txtund
- txtred
- echo  "find . -type f -iname '*'$1'*' -print | xargs grep -i $2"
- txtrst
- txtblue
- find . -type f -iname '*'$1'*' -print | xargs grep -n -i $2
- txtrst
- txtred
- echo "RESULTS END"
- txtrst
- cd $currpath
 }
 
 #dont know
