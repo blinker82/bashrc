@@ -20,13 +20,16 @@ alias ll='ls -l'
 #plugin aliases
 alias gvimr_init='gvim_init_remote GVIM'
 alias gvimr='gvim_open_remote GVIM'
-alias tag='/usr/bin/ctags -R * &'
-
+alias tag='/usr/bin/ctags -R `find . -name "*.[ch]" -print` &'
+alias intag='find * -type d -exec /local/mnt/workspace/qnx/scripts/dirtags.sh {} \;'
 #bash function aliases
 alias of='openfile'
 alias ofb='openfilebase'
+alias ofr='openfile_gvimr'
 alias ofg='openfile_godir'
-alias fif='findinfile'
+alias fif='findinfile "-i -n"'
+alias fifg='findinfile'
+alias fifw='findinfile "-i -n -w"'
 alias fifbase='findinfilebase'
 alias archivenow='create_archive_tar_gz'
 
@@ -115,6 +118,19 @@ function openfile()
 }
 
 
+function openfile_gvimr()
+{
+   PS3="Type a number or 'q' to quit:"
+   fileList=$(find . -type f -iname '*'$*'*')
+   txtblue
+   select fileName in $fileList; do
+        if [ -n "$fileName" ]; then
+           gvimr ${fileName}
+        fi
+        break
+   done
+   txtrst
+}
 #goto directory of this file
 function gofile()
 {
@@ -160,10 +176,10 @@ function findinfile()
  txtbld
  txtund
  txtred
- echo  "find . -type f -iname '*'$1'*' -print | xargs grep -i $2"
+ echo  "find . -type f -iname '*'$2'*' -print | xargs grep $1 $3"
  txtrst
  txtblue
- find . -type f -iname '*'$1'*' -print | xargs grep -n -i $2
+ find . -type f -iname '*'$2'*' -print | xargs grep $1 $3
  txtrst
  txtred
  echo "RESULTS END"
