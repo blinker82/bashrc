@@ -24,7 +24,6 @@ alias tag='/usr/bin/ctags -R `find . -name "*.[ch]" -print` &'
 alias intag='find * -type d -exec /local/mnt/workspace/qnx/scripts/dirtags.sh {} \;'
 #bash function aliases
 alias of='openfile'
-alias ofb='openfilebase'
 alias ofr='openfile_gvimr'
 alias ofg='openfile_godir'
 alias fif='findinfile "-i -n"'
@@ -44,12 +43,12 @@ alias p4init='export P4CONFIG=.p4config'
 # gvim
 function gvim_init_remote()
 {
-    gvim --servername $1
+    gvim  --servername $1
 }
 
 function gvim_open_remote()
 {
-    gvim --servername $1 --remote-tab $2
+    gvim  --servername $1 --remote-tab-silent $2
 }
 
 # Print the current Path
@@ -87,67 +86,67 @@ function ffr()
 #open file and also cd to that directory
 function openfile_godir()
 {
-   PS3="Type a number or 'q' to quit:"
-   fileList=$(find . -type f -iname '*'$*'*')
-   txtblue
-   select fileName in $fileList; do
+    PS3="Type a number or 'q' to quit:"
+    fileList=$(find . -type f -iname '*'$*'*')
+    txtblue
+    select fileName in $fileList; do
         if [ -n "$fileName" ]; then
-           local derivedpath=$(dirname ${fileName})
-           local derived_file_name=$(basename ${fileName})
-           cd $derivedpath
-           vim $derived_file_name
+            local derivedpath=$(dirname ${fileName})
+            local derived_file_name=$(basename ${fileName})
+            cd $derivedpath
+            vim $derived_file_name
         fi
         break
-   done
-   txtrst
+    done
+    txtrst
 }
 
 #only open file and do not cd to that directory
 function openfile()
 {
-   PS3="Type a number or 'q' to quit:"
-   fileList=$(find . -type f -iname '*'$*'*')
-   txtblue
-   select fileName in $fileList; do
+    PS3="Type a number or 'q' to quit:"
+    fileList=$(find . -type f -iname '*'$*'*')
+    txtblue
+    select fileName in $fileList; do
         if [ -n "$fileName" ]; then
-           vim ${fileName}
+            vim ${fileName}
         fi
         break
-   done
-   txtrst
+    done
+    txtrst
 }
 
 
 function openfile_gvimr()
 {
-   PS3="Type a number or 'q' to quit:"
-   fileList=$(find . -type f -iname '*'$*'*')
-   txtblue
-   select fileName in $fileList; do
+    PS3="Type a number or 'q' to quit:"
+    fileList=$(find . -type f -iname '*'$*'*')
+    txtblue
+    select fileName in $fileList; do
         if [ -n "$fileName" ]; then
-           gvimr ${fileName}
+            gvimr ${fileName}
         fi
         break
-   done
-   txtrst
+    done
+    txtrst
 }
 #goto directory of this file
 function gofile()
 {
-   PS3="Type a number or 'q' to quit:"
-   txtbld
-   txtund
-   fileList=$(find . -type f -iname '*'$*'*')
-   txtrst
-   txtblue
-   select fileName in $fileList; do
+    PS3="Type a number or 'q' to quit:"
+    txtbld
+    txtund
+    fileList=$(find . -type f -iname '*'$*'*')
+    txtrst
+    txtblue
+    select fileName in $fileList; do
         if [ -n "$fileName" ]; then
-           local derivedpath=$(dirname ${fileName})
-           cd $derivedpath
+            local derivedpath=$(dirname ${fileName})
+            cd $derivedpath
         fi
         break
-   done
-   txtrst
+    done
+    txtrst
 }
 
 #goto this directory
@@ -173,17 +172,17 @@ function godir()
 # find this text in the file
 function findinfile()
 {
- txtbld
- txtund
- txtred
- echo  "find . -type f -iname '*'$2'*' -print | xargs grep $1 $3"
- txtrst
- txtblue
- find . -type f -iname '*'$2'*' -print | xargs grep $1 $3
- txtrst
- txtred
- echo "RESULTS END"
- txtrst
+    txtbld
+    txtund
+    txtred
+    echo  "find . -type f -iname '*'$2'*' -print | xargs grep $1 $3"
+    txtrst
+    txtblue
+    find . -type f -iname '*'$2'*' -print | xargs grep $1 $3
+    txtrst
+    txtred
+    echo "RESULTS END"
+    txtrst
 }
 
 #dont know
