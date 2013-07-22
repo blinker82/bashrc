@@ -17,13 +17,30 @@ alias txtblue='tput setaf 4' #blue
 alias ls='ls --color'           
 alias ll='ls -l'
 
+# gvim
+function gvim_init_remote()
+{
+    gvim  --servername $1
+}
+
+function gvim_open_remote()
+{
+    gvim  --servername $1 --remote-tab-silent $2
+}
+
+function gvimr_GVIM_func()
+{
+   gvim_open_remote GVIM $1
+}
+
 #plugin aliases
 alias gvimr_init='gvim_init_remote GVIM'
 alias gvimr='gvim_open_remote GVIM'
-alias tag='/usr/bin/ctags -R `find . -name "*.[ch]" -print` &'
+alias tag='/usr/bin/ctags -R * &'
 alias intag='find * -type d -exec /local/mnt/workspace/qnx/scripts/dirtags.sh {} \;'
 #bash function aliases
-alias of='openfile'
+alias oft='openfile "gvimr_GVIM_func"' 
+alias of='openfile vim'
 alias ofr='openfile_gvimr'
 alias ofg='openfile_godir'
 alias fif='findinfile "-i -n"'
@@ -40,16 +57,6 @@ alias git_graph='git log --graph --full-history --all --pretty=format:"%h%x09%d%
 #P4 Alias
 alias p4init='export P4CONFIG=.p4config'
 
-# gvim
-function gvim_init_remote()
-{
-    gvim  --servername $1
-}
-
-function gvim_open_remote()
-{
-    gvim  --servername $1 --remote-tab-silent $2
-}
 
 # Print the current Path
 function print_curr_path_dir()
@@ -104,12 +111,18 @@ function openfile_godir()
 #only open file and do not cd to that directory
 function openfile()
 {
+    echo "openfile '$'"
     PS3="Type a number or 'q' to quit:"
-    fileList=$(find . -type f -iname '*'$*'*')
+    fileList=$(find . -type f -iname '*'$2'*')
     txtblue
     select fileName in $fileList; do
-        if [ -n "$fileName" ]; then
-            vim ${fileName}
+        if [ -n "$fileName" ]; 
+        then
+            if [ -z "$3" ]; then
+                $1 ${fileName}
+            else 
+                $1 +$3 ${fileName}
+            fi
         fi
         break
     done
