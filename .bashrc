@@ -1,3 +1,4 @@
+export CCACHE_DIR=/local2/mnt/workspace/ccache_dir  
 export PATH=$PATH:~/bin:/usr/local/sbin:/usr/sbin:/sbin
 export GREP_OPTIONS='--color=auto'
 
@@ -16,6 +17,8 @@ alias txtred='tput setaf 1' #red
 alias txtblue='tput setaf 4' #blue
 alias ls='ls --color'           
 alias ll='ls -l'
+alias cmthis='make clean; make install'
+
 
 # gvim
 function gvim_init_remote()
@@ -36,7 +39,9 @@ function gvimr_GVIM_func()
 #plugin aliases
 alias gvimr_init='gvim_init_remote GVIM'
 alias gvimr='gvim_open_remote GVIM'
-alias tag='/usr/bin/ctags -R * &'
+alias gvimr_init1='gvim_init_remote GVIM1'
+alias gvimr1='gvim_open_remote GVIM1'
+alias tag='echo "starting ctags ...";/usr/bin/ctags -R * ;echo "ctags done";echo "starting gtags ...";gtags;echo "gtags done"'
 alias intag='find * -type d -exec /local/mnt/workspace/qnx/scripts/dirtags.sh {} \;'
 #bash function aliases
 alias oft='openfile "gvimr_GVIM_func"' 
@@ -53,7 +58,7 @@ alias archivenow='create_archive_tar_gz'
 alias git_oneline='git log --pretty=oneline --decorate'
 alias git_pretty='git log --pretty=format:'"'"'%C(yellow)%h%Cred%d%Creset - %C(cyan)%an %Creset: %s %Cgreen(%cr)'"'"
 alias git_graph='git log --graph --full-history --all --pretty=format:"%h%x09%d%x20%s"'
-
+alias git_diff='git difftool --tool="bc3"'
 #P4 Alias
 alias p4init='export P4CONFIG=.p4config'
 
