@@ -5,7 +5,6 @@ export GREP_OPTIONS='--color=auto'
 #-----------------
 #aliases
 #-----------------
-
 # General aliases
 alias now='date +%d_%b_%Y_%H_%M'
 alias cp='cp -v'
@@ -15,11 +14,11 @@ alias txtund='tput sgr 0 1' #underline
 alias txtrst='tput sgr0' #Reset
 alias txtred='tput setaf 1' #red
 alias txtblue='tput setaf 4' #blue
-alias ls='ls --color'           
+alias lc='ls --color=auto'           
 alias ll='ls -l'
 alias cmthis='make clean; make install'
-
-
+alias gitignore='git update-index --skip-worktree'
+alias lss='selectdirectory'
 # gvim
 function gvim_init_remote()
 {
@@ -42,7 +41,7 @@ alias gvimr='gvim_open_remote GVIM'
 alias gvimr_init1='gvim_init_remote GVIM1'
 alias gvimr1='gvim_open_remote GVIM1'
 alias tag='echo "starting ctags ...";/usr/bin/ctags -R * ;echo "ctags done";echo "starting gtags ...";gtags;echo "gtags done"'
-alias intag='find * -type d -exec /local/mnt/workspace/qnx/scripts/dirtags.sh {} \;'
+
 #bash function aliases
 alias oft='openfile "gvimr_GVIM_func"' 
 alias of='openfile vim'
@@ -62,18 +61,21 @@ alias git_diff='git difftool --tool="bc3"'
 #P4 Alias
 alias p4init='export P4CONFIG=.p4config'
 
-
+function find_dir_in_path()
+{
+    local temp=$(echo $1 | grep -i $2)
+    if [ -n "$temp" ]
+    then
+        echo $1 | sed -re 's/(^.*'$2')(.*)/\1/I'
+    fi
+}
 # Print the current Path
 function print_curr_path_dir()
 {
-    local temp=$(pwd | grep -i $1)
-    if [ -n "$temp" ]
-    then
-        pwd | sed -re 's/(^.*'$1')(.*)/\1/I'
-    fi
+    find_dir_in_path $(pwd) $1
 }
 
-#list files which contain the following name in current directory and sub
+# ff
 function ff() 
 { 
     txtbld
@@ -82,6 +84,20 @@ function ff()
     txtrst
     txtblue
     find . -type f -iname '*'$*'*' -ls
+    txtbld
+    txtund
+    echo "END RESULTS"
+    txtrst
+}
+#list files which contain the following name in current directory and sub
+function ffw() 
+{ 
+    txtbld
+    txtund
+    echo "find . -type f -iname '$*' -ls"
+    txtrst
+    txtblue
+    find . -type f -iname $1 -ls
     txtbld
     txtund
     echo "END RESULTS"
@@ -187,6 +203,23 @@ function godir()
 }
 
 
+function godirw()
+{
+    PS3="Type a number or 'q' to quit:"
+    txtbld
+    txtund
+    echo "find . -type d -iname $*"
+    txtrst
+    folderList=$(find . -type d -iname $*)
+    txtblue
+    select folderName in $folderList; do
+        if [ -n "$folderName" ]; then
+            cd ${folderName}
+        fi
+        break
+    done
+    txtrst
+}
 # find this text in the file
 function findinfile()
 {
@@ -219,5 +252,19 @@ function listinfile()
    done
 }
 
+function selectdirectory()
+{
+    printf "Please select folder:\n"
+    select d in */; do test -n "$d" && break; echo ">>> Invalid Selection"; done
+    cd "$d" && pwd
+}
+
 #Source qc specific bashfile
-source ~/bashrc_qc/.bashrc_qc
+if [ -f ~/bashrc_qc/.bashrc_qc ]
+then
+    echo "~/bashrc_qc/.bashrc_qc exists. Sourcing it."
+    source ~/bashrc_qc/.bashrc_qc
+else
+    echo "~/bashrc_qc/.bashrc_qc does not exists. Please ask owner for its location."
+fi
+
