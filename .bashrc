@@ -6,7 +6,7 @@ export GREP_OPTIONS='--color=auto'
 #aliases
 #-----------------
 # General aliases
-alias now='date +%d_%b_%Y_%H_%M'
+alias now='date +%d_%b_%Y_%H_%M_%S'
 alias cp='cp -v'
 alias chmod='chmod -c'
 alias txtbld='tput bold'  #bold
@@ -35,11 +35,22 @@ function gvimr_GVIM_func()
    gvim_open_remote GVIM $1
 }
 
+function gvimr_init()
+{
+    export thiswindow=$(now)
+    gvim_init_remote $thiswindow 
+}
+
+function gvimr()
+{
+    gvim_open_remote $thiswindow $1
+}
+
 #plugin aliases
-alias gvimr_init='gvim_init_remote GVIM'
-alias gvimr='gvim_open_remote GVIM'
-alias gvimr_init1='gvim_init_remote GVIM1'
-alias gvimr1='gvim_open_remote GVIM1'
+#alias gvimr_init='gvim_init_remote GVIM'
+#alias gvimr='gvim_open_remote GVIM'
+#alias gvimr_init1='gvim_init_remote GVIM1'
+#alias gvimr1='gvim_open_remote GVIM1'
 alias tag='echo "starting ctags ...";/usr/bin/ctags -R * ;echo "ctags done";echo "starting gtags ...";gtags;echo "gtags done"'
 
 #bash function aliases
@@ -260,11 +271,11 @@ function selectdirectory()
 }
 
 #Source qc specific bashfile
-if [ -f ~/bashrc_qc/.bashrc_qc ]
+if [ -f ~/.bashrc_qc ]
 then
-    echo "~/bashrc_qc/.bashrc_qc exists. Sourcing it."
-    source ~/bashrc_qc/.bashrc_qc
+    echo "~/.bashrc_qc exists. Sourcing it."
+    source ~/.bashrc_qc
 else
-    echo "~/bashrc_qc/.bashrc_qc does not exists. Please ask owner for its location."
+    echo "~/.bashrc_qc does not exists. Please ask owner for its location."
 fi
 
