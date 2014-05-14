@@ -17,6 +17,7 @@ alias txtblue='tput setaf 4' #blue
 alias lc='ls --color=auto'           
 alias ll='ls -l'
 alias cmthis='make clean; make install'
+alias cmthisw='make clean; make install CCFLAGS=-Werror'
 alias gitignore='git update-index --skip-worktree'
 alias lss='selectdirectory'
 # gvim
