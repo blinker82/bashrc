@@ -241,7 +241,7 @@ function findinfile()
     echo  "find . -type f -iname '*'$2'*' -print | xargs grep $1 $3"
     txtrst
     txtblue
-    find . -type f -iname '*'$2'*' -print | xargs grep $1 $3
+    find . -type f -iname '*'$2'*' -print | xargs grep $1 "$3"
     txtrst
     txtred
     echo "RESULTS END"
