@@ -20,7 +20,16 @@ alias cmthis='make clean; make install'
 alias cmthisw='make clean; make install CCFLAGS=-Werror'
 alias gitignore='git update-index --skip-worktree'
 alias lss='selectdirectory'
-# gvim
+alias git_clean='ls -1 | grep -v .git  | xargs rm -rf gvim'
+
+function append_string()
+{
+    for filename in $(find . -type f -regex ".*\.\(c\|h\)"); do
+       echo $filename
+       echo sed -i "s/$1/$1$2/g" $filename
+       sed -i "s/$1/$1$2/g" $filename
+    done
+}
 function gvim_init_remote()
 {
     gvim  --servername $1
