@@ -12,11 +12,7 @@ export P4DIFF=/usr/bin/bcompare
 alias now='date +%d_%b_%Y_%H_%M_%S'
 alias cp='cp -v'
 alias chmod='chmod -c'
-alias txtbld='tput bold'  #bold
-alias txtund='tput sgr 0 1' #underline
-alias txtrst='tput sgr0' #Reset
-alias txtred='tput setaf 1' #red
-alias txtblue='tput setaf 4' #blue
+
 alias lc='ls --color=auto'           
 alias ll='ls -l'
 #alias cmthis='make clean; make install'

@@ -373,3 +373,44 @@ function set-title() {
   TITLE="\[\e]2;$@\a\]"
   PS1=${ORIG}${TITLE}
 }
+
+function txtbld() {
+  if hash tput 2>/dev/null; then
+      tput bold  #bold
+  else
+      :
+  fi
+}
+
+function txtund() {
+  if hash tput 2>/dev/null; then
+      tput sgr 0 1 #underline
+  else
+      :
+  fi
+}
+
+function txtrst() {
+  if hash tput 2>/dev/null; then
+      tput sgr0 #Reset
+  else
+      :
+  fi
+}
+
+function txtred() {
+  if hash tput 2>/dev/null; then
+      tput setaf 1 #red
+  else
+      :
+  fi
+}
+
+
+function txtblue() {
+  if hash tput 2>/dev/null; then
+      tput setaf 4 #blue
+  else
+      :
+  fi
+}
