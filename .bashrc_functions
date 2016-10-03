@@ -52,6 +52,7 @@ alias oft='openfile "gvimr_GVIM_func"'
 alias of='openfile vim'
 alias ofr='openfile_gvimr'
 alias ofg='openfile_godir'
+alias ofrp4='openfile_reconcile_p4'
 alias fif='findinfile "-i -n"'
 alias fife='findinfile_ext "-i -n"'
 alias fifg='findinfile'
@@ -244,14 +245,14 @@ function openfile()
 }
 
 
-function openfile_gvimr()
+function openfile_p4_reconcile()
 {
     PS3="Type a number or 'q' to quit:"
     fileList=$(find . -type f -iname '*'$*'*')
     txtblue
     select fileName in $fileList; do
         if [ -n "$fileName" ]; then
-            gvimr ${fileName}
+            p4 reconcile -e ${fileName}
         fi
         break
     done

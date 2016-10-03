@@ -1,5 +1,6 @@
+#[[ $- == *i* ]] || return
 export CCACHE_DIR=/local2/mnt/workspace/ccache_dir  
-export PATH=$PATH:~/bin:/usr/local/sbin:/usr/sbin:/sbin
+export PATH=$PATH:/bin:/usr/local/sbin:/usr/sbin:/sbin
 export GREP_OPTIONS='--color=auto'
 export CATALINA_HOME=/usr/share/tomcat7/
 export OPENGROK_TOMCAT_BASE=$CATALINA_HOME
