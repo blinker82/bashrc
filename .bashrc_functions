@@ -45,7 +45,8 @@ function gvimrv()
 #alias gvimr='gvim_open_remote GVIM'
 #alias gvimr_init1='gvim_init_remote GVIM1'
 #alias gvimr1='gvim_open_remote GVIM1'
-alias tag='echo "starting ctags ...";/usr/bin/ctags -R * ;echo "ctags done";echo "starting gtags ...";gtags;echo "gtags done"'
+#alias tag='echo "starting ctags ...";ctags -R * ;echo "ctags done";echo "starting gtags ...";gtags;echo "gtags done"'
+alias tag='echo "starting gtags ...";gtags;echo "gtags done" ; cscope -R -b -q -k'
 
 #bash function aliases
 alias oft='openfile "gvimr_GVIM_func"' 
@@ -59,7 +60,11 @@ alias fifg='findinfile'
 alias fifw='findinfile "-i -n -w"'
 alias fifbase='findinfilebase'
 alias archivenow='create_archive_tar_gz'
-
+function showp4
+{
+    local hist=$(p4 changes ...  | cut -d " " -f 2 | xargs -I{} p4 describe -s {} | sed -n  '/Change/,/Fixes/p ; /^\.\.\./p' | sed '/^$/d')
+    echo "$hist"
+}
 #GIT
 alias git_oneline='git log --pretty=oneline --decorate'
 alias git_pretty='git log --pretty=format:'"'"'%C(yellow)%h%Cred%d%Creset - %C(cyan)%an %Creset: %s %Cgreen(%cr)'"'"
@@ -67,6 +72,19 @@ alias git_graph='git log --graph --full-history --all --pretty=format:"%h%x09%d%
 alias git_diff='git difftool --tool="bc3"'
 #P4 Alias
 alias p4init='export P4CONFIG=.p4config'
+
+function fpush
+{
+    lftp -e "put -O $1 $2; Bye" -u root,root $3
+}
+function fget
+{
+    lftp -e "get -O $1 $2; Bye" -u root,root $3
+}
+function getwinpath
+{
+    readlink -f $1 | sed 's/\//\\/g' | sed 's/\\local\\mnt/\\\\aneeketp-linux/g'
+}
 function countdown
 {
         local OLD_IFS="${IFS}"
@@ -120,7 +138,6 @@ function p4_add()
 }
 function listfiles()
 {
-    echo "find $1  -type f ! -name '*\.so*' ! -name '*\a' ! -name '*\.pinfo' ! -name '*\.o' ! -name '*\.map'"
     find $1  -type f ! -name '*\.so*' ! -name '*\a' ! -name '*\.pinfo' ! -name '*\.o' ! -name '*\.map'
 }
 function find_dir_in_path()
@@ -414,4 +431,8 @@ function txtblue() {
   else
       :
   fi
+}
+
+function create_gitrepo() {
+curl -i -H 'Authorization: token 65d2ded62fd98f446d0ddcf53d07be2bc7d23c45' -d '{ "name": "'$1'", "auto_init": true, "private": false, "gitignore_template": "nanoc" }' https://github.qualcomm.com/api/v3/user/repos
 }
