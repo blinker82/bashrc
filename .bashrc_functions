@@ -46,7 +46,6 @@ function gvimrv()
 #alias gvimr_init1='gvim_init_remote GVIM1'
 #alias gvimr1='gvim_open_remote GVIM1'
 #alias tag='echo "starting ctags ...";ctags -R * ;echo "ctags done";echo "starting gtags ...";gtags;echo "gtags done"'
-alias tag='echo "starting gtags ...";gtags;echo "gtags done" ; cscope -R -b -q -k'
 
 #bash function aliases
 alias oft='openfile "gvimr_GVIM_func"' 
@@ -73,6 +72,19 @@ alias git_diff='git difftool --tool="bc3"'
 #P4 Alias
 alias p4init='export P4CONFIG=.p4config'
 
+function tag
+{
+    #export GTAGSCONF=/etc/gtags.conf
+    export TMPDIR=.
+    export GTAGSFORCEENDBLOCK=
+    echo "starting gtags ..."
+    gtags --skip-unreadable
+    echo "starting cscope ..."
+    cscope -R -b -q -k
+    echo "cscope done"
+    echo "gtags done" 
+}
+
 function fpush
 {
     lftp -e "put -O $1 $2; Bye" -u root,root $3
@@ -83,7 +95,13 @@ function fget
 }
 function getwinpath
 {
-    readlink -f $1 | sed 's/\//\\/g' | sed 's/\\local\\mnt/\\\\aneeketp-linux/g'
+    fullpath=$(readlink -f $1)
+    if [[ $fullpath == *"local2"* ]]
+    then
+        readlink -f $1 | sed 's/\//\\/g' | sed 's/\\local2\\mnt\\workspace/\\\\aneeketp-linux\\workspace2/g'
+    else
+        readlink -f $1 | sed 's/\//\\/g' | sed 's/\\local\\mnt\\workspace/\\\\aneeketp-linux\\workspace/g'
+    fi
 }
 function countdown
 {
@@ -433,6 +451,10 @@ function txtblue() {
   fi
 }
 
+# function create_gitrepo() {
+# curl -i -H 'Authorization: token fd64cd5450e4b9dedfec235d534fd28b6696814e' -d '{ "name": "'$1'", "auto_init": true, "private": false, "gitignore_template": "nanoc" }' https://api.github.com/graphql
+# }
+
 function create_gitrepo() {
-curl -i -H 'Authorization: token 65d2ded62fd98f446d0ddcf53d07be2bc7d23c45' -d '{ "name": "'$1'", "auto_init": true, "private": false, "gitignore_template": "nanoc" }' https://github.qualcomm.com/api/v3/user/repos
+curl -i -H 'Authorization: token fd64cd5450e4b9dedfec235d534fd28b6696814e' -d '{ "name": "'$1'", "auto_init": true, "private": false, "gitignore_template": "nanoc" }' https://api.github.com/user/repos
 }
