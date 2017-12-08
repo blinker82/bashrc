@@ -38,8 +38,8 @@ if [ "$VIM" ]
 then 
     # For gvim's monochromatic :shell 
     PS1='\n\u@\h \w\n\$ ' 
-    unalias ls 
-    unalias grep
+    #unalias ls 
+    #unalias grep
     :
 fi 
 #Source qc specific bashfile

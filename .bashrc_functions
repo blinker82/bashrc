@@ -59,9 +59,15 @@ alias fifg='findinfile'
 alias fifw='findinfile "-i -n -w"'
 alias fifbase='findinfilebase'
 alias archivenow='create_archive_tar_gz'
+
 function showp4
 {
     local hist=$(p4 changes ...  | cut -d " " -f 2 | xargs -I{} p4 describe -s {} | sed -n  '/Change/,/Fixes/p ; /^\.\.\./p' | sed '/^$/d')
+    echo "$hist"
+}
+function showp4opened
+{
+    local hist=$(p4 opened -u $P4USER -c $P4CLIENT ...  | cut -d " " -f 2 | xargs -I{} p4 describe -s {} | sed -n  '/Change/,/Fixes/p ; /^\.\.\./p' | sed '/^$/d')
     echo "$hist"
 }
 #GIT
@@ -70,17 +76,37 @@ alias git_pretty='git log --pretty=format:'"'"'%C(yellow)%h%Cred%d%Creset - %C(c
 alias git_graph='git log --graph --full-history --all --pretty=format:"%h%x09%d%x20%s"'
 alias git_diff='git difftool --tool="bc3"'
 #P4 Alias
-alias p4init='export P4CONFIG=.p4config'
+function p4init
+{
+    set -a
+    export P4CONFIG=.p4config
+    . .p4config
+    set +a
+}
 
+function build_cscope_db_func()
+{
+    find $PWD -name "*.c" \
+        -o -name "*.h" \
+        -o -name "*.cpp" \
+        -o -name "*.lua" \
+        -o -name "*.mk" \
+        -o -name "*.xml"\
+        -o -name "*.cfg"\
+        -o -name "*.ini"\
+#        -o -name "*.dat"\
+        -o -name "*.cpp" > $PWD/cscope.files
+}
 function tag
 {
     #export GTAGSCONF=/etc/gtags.conf
+    build_cscope_db_func
     export TMPDIR=.
     export GTAGSFORCEENDBLOCK=
     echo "starting gtags ..."
     gtags --skip-unreadable
     echo "starting cscope ..."
-    cscope -R -b -q -k
+    cscope -R -b -q -k -i $PWD/cscope.files
     echo "cscope done"
     echo "gtags done" 
 }
@@ -150,13 +176,15 @@ function cmthis()
     make clean
     make install
 }
+
+
 function p4_add()
 {
-    find $1  -type f ! -name '*\.so*' ! -name '*\a' ! -name '*\.pinfo' ! -name '*\.o' | p4 -x - add
+    find $1  -type f ! -name '*\.so*' ! -name '*\.a' ! -name '*\.Sa' ! -name '*\.pinfo' ! -name '*\.o' | p4 -x - add
 }
 function listfiles()
 {
-    find $1  -type f ! -name '*\.so*' ! -name '*\a' ! -name '*\.pinfo' ! -name '*\.o' ! -name '*\.map'
+    find $1  -type f ! -name '*\.so*' ! -name '*\.a' ! -name '*\.Sa' ! -name '*\.pinfo' ! -name '*\.o' ! -name '*\.map'
 }
 function find_dir_in_path()
 {
@@ -458,3 +486,43 @@ function txtblue() {
 function create_gitrepo() {
 curl -i -H 'Authorization: token fd64cd5450e4b9dedfec235d534fd28b6696814e' -d '{ "name": "'$1'", "auto_init": true, "private": false, "gitignore_template": "nanoc" }' https://api.github.com/user/repos
 }
+
+function hexdump_word()
+{
+    dd if=$1 bs=4 2>/dev/null | hexdump -v -e '"%08_ax: "' -e ' 4/4 "%08x " " |"' -e '16/1 "%_p" "|\n"'
+}
+
+function hexdump_()
+{
+    hexdump -v -e '"%08_ax: "' -e ' 4/4 "%08x " " |"' -e '16/1 "%_p" "|\n"' $1
+}
+__desc_chg()
+{
+   echo "$1"
+   num=`echo $1 | awk '{print $2}'`
+   p4 opened -c $num 2>&1 | awk '{print "        "$1,$2,$3,$6}'
+   echo 
+}
+
+__desc_shelved_chg()
+{
+    echo "$1"
+    num=`echo $1 | awk '{print $2}'`
+    p4 describe -S $num 2>&1 | awk '{print "        "$1,$2,$3,$6}'
+    echo 
+}
+
+
+__p4pending()
+{
+   __desc_chg "Change default by $P4USER@$P4CLIENT *pending*" 
+   p4 changes -u $P4USER -c $P4CLIENT -s pending | sort -k2 -n | while read -r l; do __desc_chg "$l"; done
+}
+
+__p4shelved()
+{
+   __desc_chg "Change default by $P4USER@$P4CLIENT *pending*" 
+   p4 changes -u $P4USER -c $P4CLIENT -s shelved | sort -k2 -n | while read -r l; do __desc_shelved_chg "$l"; done
+}
+alias p4pending='__p4pending'  
+alias p4shelved='__p4shelved'  
