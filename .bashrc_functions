@@ -70,6 +70,21 @@ function showp4opened
     local hist=$(p4 opened -u $P4USER -c $P4CLIENT ...  | cut -d " " -f 2 | xargs -I{} p4 describe -s {} | sed -n  '/Change/,/Fixes/p ; /^\.\.\./p' | sed '/^$/d')
     echo "$hist"
 }
+
+function p4changesperweek
+{
+    weeknum=$1
+    enddate=$(date --date="${weeknum} week ago" +"%Y/%m/%d")
+    weeknum1=$((weeknum-1))
+    startdate=$(date --date="${weeknum1} week ago" +"%Y/%m/%d")
+    echo "Number of changes between $enddate -- $startdate\n"
+    p4 changes ...@$enddate,$startdate | wc -l
+}
+
+function p4shelveddiff
+{
+    p4 describe -S -du $1
+}
 #GIT
 alias git_oneline='git log --pretty=oneline --decorate'
 alias git_pretty='git log --pretty=format:'"'"'%C(yellow)%h%Cred%d%Creset - %C(cyan)%an %Creset: %s %Cgreen(%cr)'"'"
@@ -80,6 +95,7 @@ function p4init
 {
     set -a
     export P4CONFIG=.p4config
+    export P4IGNORE=.p4ignore
     . .p4config
     set +a
 }
@@ -119,15 +135,15 @@ function fget
 {
     lftp -e "get -O $1 $2; Bye" -u root,root $3
 }
-function getwinpath
+
+function fpushd
 {
-    fullpath=$(readlink -f $1)
-    if [[ $fullpath == *"local2"* ]]
-    then
-        readlink -f $1 | sed 's/\//\\/g' | sed 's/\\local2\\mnt\\workspace/\\\\aneeketp-linux\\workspace2/g'
-    else
-        readlink -f $1 | sed 's/\//\\/g' | sed 's/\\local\\mnt\\workspace/\\\\aneeketp-linux\\workspace/g'
-    fi
+    lftp -e "mirror $1 $2; Bye" -u root,root $3
+}
+
+function fgetd
+{
+    lftp -e "mirror $1 $2; Bye" -u root,root $3
 }
 function countdown
 {
@@ -174,6 +190,7 @@ function cmthis()
         fi
     fi
     make clean
+    make hinstall
     make install
 }
 
@@ -483,10 +500,29 @@ function txtblue() {
 # curl -i -H 'Authorization: token fd64cd5450e4b9dedfec235d534fd28b6696814e' -d '{ "name": "'$1'", "auto_init": true, "private": false, "gitignore_template": "nanoc" }' https://api.github.com/graphql
 # }
 
-function create_gitrepo() {
-curl -i -H 'Authorization: token fd64cd5450e4b9dedfec235d534fd28b6696814e' -d '{ "name": "'$1'", "auto_init": true, "private": false, "gitignore_template": "nanoc" }' https://api.github.com/user/repos
-}
+#function create_gitrepo() {
+#curl -i -H 'Authorization: token fd64cd5450e4b9dedfec235d534fd28b6696814e' -d '{ "name": "'$1'", "auto_init": true, "private": false, "gitignore_template": "nanoc" }' https://api.github.com/user/repos
+#}
 
+function create_gitrepo() {
+    if [ -z "$1" ]
+    then
+        echo "input the authorization token -> github ->settings -> Developer Settings -> personal access token \n"
+        read token 
+    else
+        token=$1
+    fi
+
+    if [ -z "$2" ]
+    then
+        echo "input the authorization token -> github ->settings -> Developer Settings -> personal access token \n"
+        read repo_name 
+    else
+        repo_name=$2
+    fi
+    #echo  curl -i -H 'Authorization: token '$token'' -d '{ "name": "'$repo_name'", "auto_init": true, "private": false, "gitignore_template": "nanoc" }' https://api.github.com/user/repos
+    curl -i -H 'Authorization: token '$token'' -d '{ "name": "'$repo_name'", "auto_init": true, "private": false, "gitignore_template": "nanoc" }' https://api.github.com/user/repos
+}
 function hexdump_word()
 {
     dd if=$1 bs=4 2>/dev/null | hexdump -v -e '"%08_ax: "' -e ' 4/4 "%08x " " |"' -e '16/1 "%_p" "|\n"'
@@ -501,6 +537,7 @@ __desc_chg()
    echo "$1"
    num=`echo $1 | awk '{print $2}'`
    p4 opened -c $num 2>&1 | awk '{print "        "$1,$2,$3,$6}'
+   p4 describe $num | grep -i orbit
    echo 
 }
 
@@ -516,13 +553,37 @@ __desc_shelved_chg()
 __p4pending()
 {
    __desc_chg "Change default by $P4USER@$P4CLIENT *pending*" 
-   p4 changes -u $P4USER -c $P4CLIENT -s pending | sort -k2 -n | while read -r l; do __desc_chg "$l"; done
+   p4 changes -u $P4USER -c $P4CLIENT -s pending | sort -k2 -n | while read -r l;
+   do 
+       __desc_chg "$l"; 
+   done
 }
 
 __p4shelved()
 {
    __desc_chg "Change default by $P4USER@$P4CLIENT *pending*" 
-   p4 changes -u $P4USER -c $P4CLIENT -s shelved | sort -k2 -n | while read -r l; do __desc_shelved_chg "$l"; done
+   p4 changes -u $P4USER -c $P4CLIENT -s shelved | sort -k2 -n | while read -r l;
+   do 
+       __desc_shelved_chg "$l"; 
+   done
 }
 alias p4pending='__p4pending'  
 alias p4shelved='__p4shelved'  
+
+
+addcc()
+{
+    ccollab admin review  create --title "$1"
+    ccollab addchangelist last $2
+}
+
+p4weekly()
+{
+    DATE=$1
+    WEEKS=$2
+    for i in {0.."$WEEK"}
+    do
+        NEXT_DATE=$(date +%Y/%m/%d -d "$DATE + $i day")
+        echo "$NEXT_DATE"
+    done
+}

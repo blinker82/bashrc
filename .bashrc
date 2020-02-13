@@ -1,4 +1,7 @@
 #[[ $- == *i* ]] || return
+if [[ -r ~/.bashrc_local ]]; then
+    . ~/.bashrc_local
+fi
 export CCACHE_DIR=/local2/mnt/workspace/ccache_dir  
 export PATH=$PATH:/bin:/usr/local/sbin:/usr/sbin:/sbin
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
@@ -63,3 +66,7 @@ PROMPT_COMMAND='
 
 PS1='\[\e[$prompt_color;7m\][\u@$myhost \T \w>\[\e[0m\]'
 #PS1='\u@$myhost \T \w>'
+export PATH="/usr2/aneeketp/.linuxbrew/bin:$PATH"
+export MANPATH="/usr2/aneeketp/.linuxbrew/share/man:$MANPATH"
+export INFOPATH="/usr2/aneeketp/.linuxbrew/share/info:$INFOPATH"
+export HOMEBREW_CACHE="/usr2/aneeketp/.linuxbrew/cache"
